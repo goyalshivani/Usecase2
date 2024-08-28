@@ -22,11 +22,11 @@ stages:
 
     - task: SonarCloud@1
       inputs:
-        sonarCloud: '<Your-SonarCloud-Service-Connection>'
-        organization: '<Your-SonarCloud-Organization>'
+        sonarCloud: 'sonarcloudservice'
+        organization: 'sonarcloudusecase'
         scannerMode: 'MSBuild'
-        projectKey: '<Your-Project-Key>'
-        projectName: '<Your-Project-Name>'
+        projectKey: 'sonarcloudusecase_sonarproject'
+        projectName: 'sonarproject'
         extraProperties: |
           sonar.verbose=true
       displayName: 'Run SonarQube Analysis'
@@ -51,8 +51,8 @@ stages:
           steps:
           - task: AzureWebApp@1
             inputs:
-              azureSubscription: '<Your-Azure-Service-Connection>'
-              appName: '<Your-Dev-WebApp-Name>'
+              azureSubscription: 'MyAzureServiceConnection'
+              appName: 'webappusecase5'
               package: '$(Pipeline.Workspace)/drop/**/*.zip'
             displayName: 'Deploy to DEV Web App'
 
@@ -69,7 +69,7 @@ stages:
           steps:
           - task: AzureWebApp@1
             inputs:
-              azureSubscription: '<Your-Azure-Service-Connection>'
-              appName: '<Your-QA-WebApp-Name>'
+              azureSubscription: 'MyAzureServiceConnection'
+              appName: 'webappusecase5'
               package: '$(Pipeline.Workspace)/drop/**/*.zip'
             displayName: 'Deploy to QA Web App'
