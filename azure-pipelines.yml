@@ -78,7 +78,7 @@ stages:
           steps:
           - task: AzureWebApp@1
             inputs:
-              azureSubscription: 'MyAzureServiceConnection'
+              azureSubscription: 'Free Trial(28e56ee1-eeb3-42a1-a92d-75577eaabd9a'
               appName: 'webappusecase5'
               package: '$(Pipeline.Workspace)/drop/**/*.zip'
             displayName: 'Deploy to QA Web App'
