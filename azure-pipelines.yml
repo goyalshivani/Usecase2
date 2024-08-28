@@ -20,15 +20,24 @@ stages:
         dotnet build --configuration Release
       displayName: 'Build .NET Application'
 
-    - task: SonarCloud@1
+    # - task: SonarCloud@1
+    #   inputs:
+    #     sonarCloud: 'sonarcloudservice'
+    #     organization: 'sonarcloudusecase'
+    #     scannerMode: 'MSBuild'
+    #     projectKey: 'sonarcloudusecase_sonarproject'
+    #     projectName: 'sonarproject'
+    #     extraProperties: |
+    #       sonar.verbose=true
+     
+      #displayName: 'Run SonarQube Analysis'
+      
+    - task: SonarCloudPrepare@2
       inputs:
-        sonarCloud: 'sonarcloudservice'
-        organization: 'sonarcloudusecase'
-        scannerMode: 'MSBuild'
-        projectKey: 'sonarcloudusecase_sonarproject'
-        projectName: 'sonarproject'
-        extraProperties: |
-          sonar.verbose=true
+          SonarCloud: 'sonarcloudservice'
+          organization: 'sonarcloudusecase'
+          scannerMode: 'MSBuild'
+          projectKey: 'sonarcloudusecase_sonarproject'
       displayName: 'Run SonarQube Analysis'
 
     - task: PublishBuildArtifacts@1
