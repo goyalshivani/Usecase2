@@ -1,0 +1,75 @@
+trigger:
+- main  # Adjust this to your default branch name
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: 'Build Application and Publish Artifacts'
+  jobs:
+  - job: Build
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '7.x'  # Adjust to the .NET version you're using
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - script: |
+        dotnet build --configuration Release
+      displayName: 'Build .NET Application'
+
+    - task: SonarCloud@1
+      inputs:
+        sonarCloud: '<Your-SonarCloud-Service-Connection>'
+        organization: '<Your-SonarCloud-Organization>'
+        scannerMode: 'MSBuild'
+        projectKey: '<Your-Project-Key>'
+        projectName: '<Your-Project-Name>'
+        extraProperties: |
+          sonar.verbose=true
+      displayName: 'Run SonarQube Analysis'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'drop'
+        publishLocation: 'Container'
+      displayName: 'Publish Artifacts'
+
+- stage: DeployToDev
+  displayName: 'Deploy to DEV Environment'
+  dependsOn: Build
+  jobs:
+  - deployment: DeployDev
+    displayName: 'Deploy Application to DEV'
+    environment: 'DEV'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: '<Your-Azure-Service-Connection>'
+              appName: '<Your-Dev-WebApp-Name>'
+              package: '$(Pipeline.Workspace)/drop/**/*.zip'
+            displayName: 'Deploy to DEV Web App'
+
+- stage: DeployToQA
+  displayName: 'Deploy to QA Environment'
+  dependsOn: DeployToDev
+  jobs:
+  - deployment: DeployQA
+    displayName: 'Deploy Application to QA'
+    environment: 'QA'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: '<Your-Azure-Service-Connection>'
+              appName: '<Your-QA-WebApp-Name>'
+              package: '$(Pipeline.Workspace)/drop/**/*.zip'
+            displayName: 'Deploy to QA Web App'
